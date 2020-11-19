@@ -14,11 +14,10 @@
   for ($j = 0; $j < $rows; ++$j)
   {
     $result->data_seek($j);
-    echo 'First Name: ' . $result->fetch_assoc()['firstname'] . '<br>';
-    $result->data_seek($j);
-    echo 'Last Name: ' .  $result->fetch_assoc()['lastname'] . '<br>';
-    $result->data_seek($j);
-    echo 'Plant: ' . $result->fetch_assoc()['plant'] . '<br>';
+    $row = $result->fetch_array(MYSQLI_ASSOC);
+    echo 'First name: ' . $row['firstname'] . '<br>';
+    echo 'Last name: '  . $row['lastname']  . '<br>';
+    echo 'Plant: '   	. $row['plant']	    . '<br>';
   }
 
   $result->close(); // release result
