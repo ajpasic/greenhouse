@@ -1,4 +1,4 @@
-<!--Author: Adi Pasic-->
+<!--Written by Adi Pasic in summer 2020-->
 <!--adijpasic@gmail.com-->
 
 <!doctype html>
@@ -6,30 +6,36 @@
   <head>
     <meta charset = "utf-8">
     <meta name = "viewport" content = "width=device-width, initial-scale=1">
-    <title>Reap-Eat</title>
-    <link rel = "stylesheet" href = "style.css">
-    <script src = "script.js"></script>
+    <title>Reap-Eat: The Smart Greenhouse</title>
+    <link rel = "stylesheet" href = "styles.css">
+    <script src = "scripts.js"></script>
   </head>
   <body>
     <header>
-      
+      <div class = "image"></div>
     </header>
+    <nav role = "navigation" aria-label = "navigation bar">
+      <ul id = "topnav" class = "topnav">
+	<button onclick = "toggleNav()">&#9776;</button>
+        <h1>Reap-Eat: The Smart Greenhouse</h1>
+      </ul>
+      <ul class = "sidenav" id = "sidenav">
+        <li><a href = "#about" onclick = "toggleNav()">About</a></li>
+        <li><a href = "#header1" onclick = "toggleNav()">Header1</a></li>
+        <li><a href = "#header2" onclick = "toggleNav()">Header2</a></li>
+        <li><a href = "#header3" onclick = "toggleNav()">Header3</a></li>
+        <li><a href = "#header4" onclick = "toggleNav()">Header4</a></li>
+      </ul>
+    </nav>
+
     <main>
-      <h1 class = "title">Reap-Eat: The Smart Greenhouse</h1>
-      <h2>Database Queries</h2>
-      <form>
-	<label>Customer First Name</label><br>
-	<input type="text"><br>
-	<label>Customer Last Name</label><br>
-	<input type="text"><br>
-	<label>Customer Plant</label><br>
-	<input type="text"><br>
-      <button onclick="alert('Hello world!')">Alert</button>
-      <button>Insert Data</button>
-      <button>Delete Data</button>
+      <h2 id = "about">About</h2>
+      <h2 id = "header1">Header1</h2>
+      <h2 id = "header2">Header2</h2>
+      <h2 id = "header3">Header3</h2>
+      <h2 id = "header4">Header4</h2>
     </main>
   </body>
   <footer>
-
   </footer>
 </html>

@@ -1,0 +1,118 @@
+/* define colors */
+:root {
+    --green: #94EC24;
+    --brown: #AE9209;
+    --white: #FFFFFF;
+			      
+}
+
+/* screen size is less than 600px */
+@media screen and (max-width: 600px) {
+    
+}
+
+/* global settings */
+
+html {
+    background-color: var(--green);
+    scroll-behavior: smooth;
+    box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+ul {
+    list-style-type: none;
+}
+
+body {
+    margin: 0;
+}
+
+main {
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+/* header */
+
+header .image{
+    height: 40vh;
+    background-color: var(--brown);
+}
+
+/* navigation */
+
+nav {
+    position: -webkit-sticky; /* for Safari browsers */
+    position: sticky;
+    top: 0;
+}
+
+nav ul {
+    padding: 0;
+    margin: 0;
+}
+
+.topnav {
+    display: flex;
+    background-color: var(--white);
+}
+
+.topnav button {
+    font-size: 36px;
+    color: #FFFFFF;
+    background-color: var(--green);
+    border-width: 2px;
+    padding: 0px 12px 6px 12px; /* top right bottom left */
+    flex: 0 0 auto; /* grow shrink basis */
+    outline: none;
+}
+
+/* remove annoying dotted line around button content */
+button::-moz-focus-inner {
+    border: 0;
+}
+
+.topnav h1 {
+    font-size: 1em;
+    flex: 1 1 auto; /* grow shrink basis */
+    text-align: right;
+    padding-right: 10px;
+}
+
+.sidenav {
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    background-color: var(--white);
+    overflow: hidden;
+    transition: 0.5s;
+    width: 0;
+}
+
+.sidenav li a {
+    display: block;
+    color: black;
+    padding: 8px;
+    text-decoration: none;
+    font-size: 25px;
+    transition: 0.3s;
+    border-color: #C8102E;
+    border-width: 5px;
+    white-space: nowrap;
+}
+
+.sidenav li a:hover {
+    background-color: var(--white);
+    color: #9;
+}
+
+/* footer */
+
+footer {
+    height: 20vh;
+    background-color: var(--brown);
+}
