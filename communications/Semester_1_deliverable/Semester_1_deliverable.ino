@@ -22,12 +22,29 @@
 #define HREF_GPIO_NUM     23
 #define PCLK_GPIO_NUM     22
 
-//const char* ssid = "CULLEN_OAKS";
-const char* ssid = "CambridgeOaks-Residents";
-const char* password = ""; //No password is needed for my Wi-Fi
-//const char* password = "@cullenoaks";
+
+const char* ssid = "Maxwell’s iPhone";
+const char* password = "maxwelljohn"; //No password is needed for my Wi-Fi
 
 AsyncWebServer server(80); //creating an object of WebServer selecting HTTP port 80 which is default
+
+const char HTML [] PROGMEM = R"rawliteral(
+<!DOCTYPE html>
+  <html>
+  <head><meta charset="UTF-8"></head>
+  <body>
+  <h1>ESP32 Camera Server</h1>
+  <form>
+  <label for="temp">Temperature:</label><br>
+  <input type="text" id="temp" name="temp"><br>
+  <label for="light_time">Amount of Light Exposure Per Day (Hours):</label><br>
+  <input type="text" id="light_time" name="light_time">
+  <input type="submit" value="Submit">
+  </form>
+  <p> Current Image: </p>
+  <img src="http://172.20.10.9/view_current_image" alt="ESP32CAM Current Image">
+  </body>
+  </html>)rawliteral";
 
 void setup() {
 //Camera Module OV2460 Initialization
@@ -92,7 +109,24 @@ void setup() {
  
     camera_fb_t * frame = NULL; //setting the pointer
     frame = esp_camera_fb_get(); //capturing the image using the ESP32 CAM library function
-    
+
+    //request->send(200, "text/plain", "hello");
+    request->send_P(200, "image/jpeg", (const uint8_t *)frame->buf, frame->len);
+      //send(HTTP staus codes, file type, what the file is)
+ 
+    esp_camera_fb_return(frame);
+  });
+  
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send(200, "text/html", HTML);
+  });
+
+  /*server.on("/view_current_image", HTTP_GET, [](AsyncWebServerRequest * request) {
+ 
+    camera_fb_t * frame = NULL; //setting the pointer
+    frame = esp_camera_fb_get(); //capturing the image using the ESP32 CAM library function
+
+    request->send(200, "text/plain", "hello");
     request->send_P(200, "image/jpeg", (const uint8_t *)frame->buf, frame->len);
       //send(HTTP staus codes, file type, what the file is)
  
