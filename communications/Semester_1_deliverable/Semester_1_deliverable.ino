@@ -3,6 +3,7 @@
 #include "esp_camera.h" //Library to access camera functionality of ESP32 CAM
 #include "WiFi.h" //Library to connect to WiFi
 #include "ESPAsyncWebServer.h" //Library for the ability to host a server
+#include "credentials.h" // ssid and password
 
 //Defining the pins for camera functionality on the ESP32 CAM AI-Thinker Model
 #define PWDN_GPIO_NUM     32
