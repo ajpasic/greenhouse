@@ -23,10 +23,6 @@
 #define HREF_GPIO_NUM     23
 #define PCLK_GPIO_NUM     22
 
-
-const char* ssid = "Maxwell’s iPhone";
-const char* password = "maxwelljohn"; //No password is needed for my Wi-Fi
-
 AsyncWebServer server(80); //creating an object of WebServer selecting HTTP port 80 which is default
 
 const char HTML [] PROGMEM = R"rawliteral(
