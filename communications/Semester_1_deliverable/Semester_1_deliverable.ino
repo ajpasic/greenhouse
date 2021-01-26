@@ -28,20 +28,73 @@ AsyncWebServer server(80); //creating an object of WebServer selecting HTTP port
 const char HTML [] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
   <html>
-  <head><meta charset="UTF-8"></head>
-  <body>
-  <h1>ESP32 Camera Server</h1>
-  <form>
-  <label for="temp">Temperature:</label><br>
-  <input type="text" id="temp" name="temp"><br>
-  <label for="light_time">Amount of Light Exposure Per Day (Hours):</label><br>
-  <input type="text" id="light_time" name="light_time">
-  <input type="submit" value="Submit">
-  </form>
-  <p> Current Image: </p>
-  <img src="http://172.20.10.9/view_current_image" alt="ESP32CAM Current Image">
-  </body>
-  </html>)rawliteral";
+    <head>
+    <meta charset="UTF-8">
+      <style>
+        button {
+          border: none;
+          text-decoration: none;
+          padding: 15px; 32px;
+          display: inline-block;
+          font-size: 16px;
+        }
+        button:hover {
+          background-color: red;
+        }
+        #img {
+          width: 50%;
+        }
+      </style>
+      <script>
+        function capture() {
+          var xhttp = new XMLHttpRequest();
+          xhttp.open("GET", "/current_image", true);
+          xhttp.responseType = "blob";
+          // set callback function for successful transaction
+          xhttp.onload = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              var urlCreator = window.URL || window.webkitURL;
+              var imageUrl = urlCreator.createObjectURL(this.response);
+              document.querySelector("#img").src = imageUrl;
+              window.URL.revokeObjectURL(imgUrl);
+            }
+          }
+          
+          
+          /*
+          xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              var blob = this.response;
+              var imgSrc = URL.createObjectURL(blob);
+              var $img = $("<img/>", {
+                "alt": "test image",
+                "src": imgSrc
+              }).appendTo($("#img")); 
+              window.URL.revokeObjectURL(imgSrc);
+            }
+          }
+          */
+          // send asynchronous request to ESP32-Cam
+          xhttp.send();
+        }
+      </script>
+    </head>
+    <body>
+      <h1>ESP32 Camera Server</h1>
+      <form>
+        <label for="temp">Temperature:</label><br>
+        <input type="text" id="temp" name="temp"><br>
+        <label for="light_time">Amount of Light Exposure Per Day (Hours):</label><br>
+        <input type="text" id="light_time" name="light_time">
+        <input type="submit" value="Submit">
+      </form>
+      <p> Current Image: </p>
+      <button onclick="toggleLED()">Toggle LED</button>
+      <button onclick="capture()">Capture Image</button>
+      <img id="img" src="/current_image" alt="ESP32CAM Current Image">
+    </body>
+  </html>
+)rawliteral";
 
 void setup() {
 //Camera Module OV2460 Initialization
@@ -102,7 +155,7 @@ void setup() {
 
   //taking a photo and sending it to the server
 
-  server.on("/view_current_image", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/current_image", HTTP_GET, [](AsyncWebServerRequest * request) {
  
     camera_fb_t * frame = NULL; //setting the pointer
     frame = esp_camera_fb_get(); //capturing the image using the ESP32 CAM library function
