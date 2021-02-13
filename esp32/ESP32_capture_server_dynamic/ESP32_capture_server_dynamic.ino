@@ -23,6 +23,7 @@
 #include <StringArray.h>
 #include <SPIFFS.h>
 #include <FS.h>
+
 #include "credentials.h"
 
 // Create AsyncWebServer object on port 80
@@ -52,13 +53,20 @@ boolean takeNewPhoto = false;
 #define PCLK_GPIO_NUM     22
 
 const char index_html[] PROGMEM = R"rawliteral(
-<!DOCTYPE HTML><html>
+<!DOCTYPE HTML>
+<html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { text-align:center; }
-    .vert { margin-bottom: 10%; }
-    .hori{ margin-bottom: 0%; }
+    body {
+      text-align:center;
+    }
+    .vert {
+      margin-bottom: 10%;
+    }
+    .hori {
+      margin-bottom: 0%;
+    }
   </style>
 </head>
 <body>
@@ -68,26 +76,33 @@ const char index_html[] PROGMEM = R"rawliteral(
     <p>
       <button onclick="rotatePhoto();">ROTATE</button>
       <button onclick="capturePhoto()">CAPTURE PHOTO</button>
-      <button onclick="location.reload();">REFRESH PAGE</button>
+      <button onclick="location.reload()">REFRESH PAGE</button>
     </p>
   </div>
-  <div><img src="saved-photo" id="photo" width="70%"></div>
+  <div><img src="saved-photo" id="photo" class = "hori" width="70%"></div>
 </body>
 <script>
   var deg = 0;
   function capturePhoto() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', "/capture", true);
+    xhr.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("photo").src = "image");
+      }
+    }
+    xhr.open("GET", "/capture", true);
     xhr.send();
   }
   function rotatePhoto() {
     var img = document.getElementById("photo");
-    deg += 90;
-    if(isOdd(deg/90)){ document.getElementById("container").className = "vert"; }
-    else{ document.getElementById("container").className = "hori"; }
+    deg += 90; deg %= 360;
+    if (img.classname == "vert") {
+      img.className = "hori";
+    } else {
+      img.className = "vert";
+    }
     img.style.transform = "rotate(" + deg + "deg)";
   }
-  function isOdd(n) { return Math.abs(n % 2) == 1; }
 </script>
 </html>)rawliteral";
 
