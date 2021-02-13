@@ -14,4 +14,4 @@ Then run the command `sudo a2dismod mpm_event && sudo a2enmod mpm_prefork && sud
 
 ## Semester 2
 # Django
-The website/ directory contains our server-side code written in the Django framework. The server can be started from within the website/ directory with the command 'python{3} manage.py runserver'. On initial startup, you can ignore the warning for unapplied migrations. This can be fixed by running the command 'python{3} manage.py makemigrations'. 
+The website/ directory contains our server-side code written in the Django framework. The server can be started from within the website/ directory with the command 'python{3} manage.py runserver'. On initial startup, you can ignore the warning for unapplied migrations. This can be fixed by running the command 'python{3} manage.py makemigrations'. Django introduces a view interface that routes urls to HTML pages, which is outlined below. ![image](img/django-http.png)
