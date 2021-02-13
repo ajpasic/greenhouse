@@ -11,3 +11,7 @@ SetHandler application/x-httpd-php
 </FilesMatch>
 ```
 Then run the command `sudo a2dismod mpm_event && sudo a2enmod mpm_prefork && sudo a2enmod php7.2`. If your version of php is incorrect, run the command a2enmod and look through the list. Place files in the `/var/www/html/` directory.
+
+## Semester 2
+# Django
+The website/ directory contains our server-side code written in the Django framework. The server can be started from within the website/ directory with the command 'python{3} manage.py runserver'. On initial startup, you can ignore the warning for unapplied migrations. This can be fixed by running the command 'python{3} manage.py makemigrations'. 
