@@ -43,7 +43,7 @@ void CMD_Execute(cmd_noun_t noun, cmd_verb_t verb, uint8_t data[4])
             {
                 /* If the sensor is working, proceed with getting measurement */
                 /* otherwise send alert message.                              */
-                if (DB_System_Read(SENSOR_AMBIENT) == FAILURE)
+                if (DB_System_Read(SENSOR_AMBIENT) != FAILURE)
                 {
                     data[0] = (uint8_t)(DB_Measurement_Read(MEASURE_TEMPERATURE)/100);
                     data[1] = 0; data[2] = 0; data[3] = 0;
@@ -69,7 +69,7 @@ void CMD_Execute(cmd_noun_t noun, cmd_verb_t verb, uint8_t data[4])
             {
                 /* If the sensor is working, proceed with getting measurement */
                 /* otherwise send alert message.                              */
-                if (DB_System_Read(SENSOR_AMBIENT) == FAILURE)
+                if (DB_System_Read(SENSOR_AMBIENT) != FAILURE)
                 {
                     data[0] = (uint8_t)(DB_Measurement_Read(MEASURE_HUMIDITY)/100);
                     data[1] = 0; data[2] = 0; data[3] = 0;
