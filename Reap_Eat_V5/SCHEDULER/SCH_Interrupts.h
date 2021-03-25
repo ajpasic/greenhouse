@@ -9,7 +9,9 @@
 #define SCHEDULER_SCH_INTERRUPTS_H_
 
 #include <ti/sysbios/knl/Semaphore.h>
+#include <xdc/cfg/global.h>
 #include <ti/sysbios/hal/Hwi.h>
+#include "DRV_Uart.h"
 
 void SCH_Interrupt_Uart0(void);
 
