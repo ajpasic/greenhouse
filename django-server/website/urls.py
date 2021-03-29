@@ -18,4 +18,5 @@ from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('esp32/', views.postesp32data), # url for esp to POST to
 ]

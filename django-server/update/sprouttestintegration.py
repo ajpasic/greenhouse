@@ -1,4 +1,3 @@
-#from http.server import HTTPServer, BaseHTTPRequestHandler  # necessary libraries
 import cv2
 import numpy as np
 import glob
@@ -9,7 +8,7 @@ net = cv2.dnn.readNet("yolov3_training_last_sprout.weights", "yolov3_testing_spr
 # Objects to be detected
 classes = ["Sprout"]
 # loading the path to the images
-images_path = glob.glob(r"C:\Users\Mjohn\PycharmProjects\PythonWebServer&ObjectDetection\venv\Scripts\capture.jpg") #Change later
+images_path = glob.glob(r"/home/adi/greenhouse/django-server/update/capture.jpg") # CHANGE THIS IF PATH IS DIFFERENT!!!
 
 #create a list that holds all of the labels detected from each model
 

@@ -25,7 +25,7 @@ SECRET_KEY = '*dd8bpdbjfzd@*(i^11#2k@m1^=cofn70ql4^0z#i(9!fy@-uw'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0', '192.168.1.183']
 
 
 # Application definition
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_celery_beat',
+    'update',
 ]
 
 MIDDLEWARE = [
@@ -107,6 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'America/Chicago'
+CELERY_TIME_ZONE = 'America/Chicago'
 
 USE_I18N = True
 
