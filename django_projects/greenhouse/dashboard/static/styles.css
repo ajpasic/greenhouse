@@ -17,6 +17,7 @@ section {
 	height: 80%;
 	background-color: goldenrod;
 	display: inline-block;
+	text-align: center;
 }
 
 #chart-div {

@@ -9,31 +9,23 @@
 </header>
 <body style="text-align: center;">
 	<section>
+		<h1>Plant Live view</h1>
+	</section>
+	<section id="system-monitor">
 		<h1>System Monitor</h1>
 		<div id="chart_div"></div>
-	</section>
-	<section>
-		<h1>Command Prompt</h1>
-		<form>
+		<form style="text-align: center;">	
 			<div id="temperature">
-				<label for="temperature">Set temperature</label>
-				<input type="number" min="60" max="100">
-				<button>Submit</button>
+				<label>Temperature Control</label>
+				<input type="range" min="60" max="80" onchange="updateTemperatureSetpoint(this.value);">
+				<input type="text" id="temperatureInput" value="72">
 			</div>
-			<br>
 			<div id="humidity">
-				<label for="humidity">Set humidity</label>
-				<input type="number" min="0" max="100">
-				<button>Submit</button>
-			</div>
-			<br>
-			<div>
-				<label for="brightness">Set brightness</label>
-				<input type="number" min="0" max="100">
-				<button>Submit</button>
+				<label>Humidity Control</label>
+				<input type="range" min="60" max="80" onchange="updateHumiditySetpoint(this.value);">
+				<input type="text" id="humidityInput" value="72">
 			</div>
 		</form>
-		
 	</section>
 </body>
 <footer>
