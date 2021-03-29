@@ -64,7 +64,7 @@ void DRV_Init(void)
                      UART_CONFIG_STOP_ONE |
                      UART_CONFIG_PAR_NONE);
     UARTEnable(UART0_BASE);
-   // UARTIntEnable(UART0_BASE, )
+    UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
 
 
     /*  UART 1 initializations.                                                */
@@ -81,6 +81,7 @@ void DRV_Init(void)
                         UART_CONFIG_STOP_ONE |
                         UART_CONFIG_PAR_NONE);
     UARTEnable(UART1_BASE);
+    UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT);
 
     /*  I2C 0  initializations.                                                */
     SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C0);
