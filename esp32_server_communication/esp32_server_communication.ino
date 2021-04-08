@@ -1,5 +1,6 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
+#include "credentials.h" /* make sure the file contents are correct!" */
 
 #include "commands.h"
 
