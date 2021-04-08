@@ -23,6 +23,9 @@
 #include "sdkconfig.h"
 #include "esp_intr_alloc.h"
 
+#include <WiFi.h>
+#include <ESPAsyncWebServer.h>
+
 char str [30];
 /************************************************************************
  *                          MACRO DEFINITION                             
@@ -32,7 +35,7 @@ char str [30];
 #define TIVA_UART   (UART_NUM_1) // UART1 connects to TIVA
 
 #define RX1         (2)          // Pin 2 is the RX pin of UART1
-#define TX1         (14)          // Pin 4 is the TX pin of UART1
+#define TX1         (14)         // Pin 4 is the TX pin of UART1
 
 #define BUF_SIZE    (1024)
 #define RD_BUF_SIZE (BUF_SIZE)
@@ -66,6 +69,30 @@ typedef struct cmd_t
 
 } cmd_t;
 
+typedef enum {
+  TEMPERATURE = 0,
+  HUMIDITY,
+  WATERING,
+  LIGHTING,
+  SYSTEM,
+  SIZE_OF_NOUN_TABLE
+} cmd_noun_t;
+
+typedef enum {
+  SET = 0,
+  GET,
+  ALERT,
+  SIZE_OF_VERB_TABLE
+} cmd_verb_t;
+
+typedef enum {
+  CRITICAL = 0,
+  WARNING,
+  AMBIENT_SENSOR_FAILURE,
+  TEMPERATURE_CONTROL_TIMEOUT,
+  SIZE_OF_ALERT_TABLE
+} cmd_alert_t;
+
 /************************************************************************
  *                          GLOBAL VARIABLES                             
  ************************************************************************/
@@ -78,9 +105,16 @@ uint8_t rxbuf1[256];  // UART1 buffer
 
 status_t status_report[NUM_CODES];
 
+const char* ssid = "71000Sarajevo";
+const char* password = "!Pasword1#";
+AsyncWebServer server(80);
+
 /************************************************************************
  *                          FUNCTION PROTOTYPES                             
  ************************************************************************/
+
+// initializes wifi connection and server resources
+static void wifi_server_init(AsyncWebServer);
 
 // initializes status report array
 static void status_init(void);
@@ -157,12 +191,14 @@ void blink_task(void *pvParameter)
 /************************************************************************
  *                      ARDUINO IDE SPECIFIC                          
  ************************************************************************/
- 
+
 void setup(void)
 {
+    Serial.begin(115200);
+    wifi_server_init(server);
     status_init();
     uart_init();
-    xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE * 2, NULL, 5, NULL);
+    // xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE * 2, NULL, 5, NULL);
 }
 
 void loop(void)
@@ -173,6 +209,55 @@ void loop(void)
 /************************************************************************
  *                         FUNCTION IMPLEMENTATION                       
  ************************************************************************/
+// initializes wifi connection and server resources
+static void wifi_server_init(AsyncWebServer server) {
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(1000);
+  }
+  Serial.print("\nESP32 connected at IP address ");
+  Serial.println(WiFi.localIP());
+
+  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request) {
+    cmd_noun_t noun = TEMPERATURE;
+    cmd_verb_t verb = GET;
+    cmd_alert_t alert;
+    
+    // TEMPERATURE GET -> TIVA
+    uint8_t tiva_command[9];
+    tiva_command[0] = (uint8_t) noun;
+    tiva_command[1] = (uint8_t) verb;
+    tiva_command[7] = (uint8_t) 0xFF;
+    uart_write_bytes(TIVA_UART, (const char*) &tiva_command, 9);
+
+    // wait until uart buffer is empty
+    uart_wait_tx_done(TIVA_UART, 100);
+    
+    // TIVA -> TEMPERATURE GET ALERT DATA1
+    uint8_t tiva_response[9];
+    uart_read_bytes(TIVA_UART, tiva_response, 9, 100);
+    
+    // clear uart buffer
+    uart_flush(TIVA_UART);
+
+    if ((cmd_alert_t) tiva_response[2] == 0) {
+        // TODO: notify server of error
+        Serial.print("Critical error");
+    }
+
+    uint8_t temperature = tiva_response[3]; // DATA1
+    String JSONresponse = String("{\"temperature\":\"") + String(temperature) + String("\"}");
+    AsyncWebServerResponse *response = request->beginResponse(200, "application/json", JSONresponse);
+    response->addHeader("Access-Control-Allow-Origin", "*"); // allow resource sharing with any origin
+    request->send(response);
+  });
+
+  // start server
+  server.begin();
+}
+
 
 // initializes status report array
 static void status_init(void)
