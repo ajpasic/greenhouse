@@ -1,11 +1,13 @@
 <html>
 <head>
+	<title>Reap-Eat</title>
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-	<script type="text/javascript" src="../static/gauge.js"></script>
+	<script type="text/javascript" src="../static/scripts.js"></script>
 	<link rel="stylesheet" href="../static/styles.css">
+	<link rel="shortcut icon" type="image/png" href="../static/img/favicon.png"/>
 </head>
 <header>
-	Reap-Eat: The Smart Greenhouse
+	<img style="width:25vw; text-align:center;" src="../static/img/reapeat-header.png">
 </header>
 <body style="text-align: center;">
 	<section>
@@ -19,11 +21,6 @@
 				<label>Temperature Control</label>
 				<input type="range" min="60" max="80" onchange="updateTemperatureSetpoint(this.value);">
 				<input type="text" id="temperatureInput" value="72">
-			</div>
-			<div id="humidity">
-				<label>Humidity Control</label>
-				<input type="range" min="60" max="80" onchange="updateHumiditySetpoint(this.value);">
-				<input type="text" id="humidityInput" value="72">
 			</div>
 		</form>
 	</section>

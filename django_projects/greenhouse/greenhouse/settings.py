@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'dashboard.apps.DashboardConfig', # object created in dashboard/apps.py
-	'jquery',
 ]
 
 MIDDLEWARE = [
