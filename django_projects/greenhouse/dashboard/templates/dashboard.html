@@ -17,9 +17,52 @@
 	</section>
 	<section id="system-monitor">
 		<h1>System Monitor</h1>
-		<div id="chart_div"></div>
-		<button id="get-temperature">Get Temperature</button>
-	</section>
+
+        <div class="gauges"; id="chart_div"></div>
+
+        <div class="split_screen_buttons">
+            <div class="get_temperature">
+                <button id="get-temperature">Get Temperature</button>
+            </div>
+            <div class="get_humidity">
+                <button id="get-humidity">Get Humidity</button>
+            </div>
+        </div>
+
+        <div class="split_screen_forms">
+            <div class="set_temperature">
+                <form id="b">
+                  <label for="fname">Set Temperature:</label><br>
+                  <input type="text" id="fname" name="fname"><br>
+                  <input type="submit" value="Submit">
+                </form>
+            </div>
+            <div class="set_humidity">
+                <form id="z">
+                  <label for="fname">Set Humidity:</label><br>
+                  <input type="text" id="fname" name="fname"><br>
+                  <input type="submit" value="Submit">
+                </form>
+            </div>
+        </div>
+
+        <div class="split_screen_toggles">
+            <div class="toggle_water_interval">
+                <form id="b">
+                  <label for="fname">Set Watering Interval:</label><br>
+                  <input type="text" id="fname" name="fname"><br>
+                  <input type="submit" value="Submit">
+                </form>
+            </div>
+            <div class="toggle_light">
+                <form id="z">
+                  <button id="toggle_light">Toggle Light</button>
+                </form>
+            </div>
+        </div>
+
+
+    </section>
 </body>
 <footer>
 </footer>

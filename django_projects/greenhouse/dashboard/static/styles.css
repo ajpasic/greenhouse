@@ -1,3 +1,66 @@
+* {
+	font-family: "Franklin Gothic Demi", Sans-Serif;
+}
+
+/*Organize gauges*/
+.gauges {
+	/*padding-left: 22.5%;*/
+	padding-left: 2%;
+}
+
+/*Organize get temp/hum buttons*/
+.split_screen_buttons {
+	padding-bottom: 8%;
+	text-align: left;
+}
+.split_screen_buttons .get_temperature {
+    display: inline-block;
+	text-align: left;
+	padding-left: 8%;
+	padding-right: 5%;
+}
+.split_screen_buttons .get_humidity {
+    display: inline-block;
+	text-align: left;
+	padding-left: 8%;
+	padding-right: 5%;
+}
+
+/*Organize set temp/hum/interval fields*/
+.split_screen_forms {
+	padding-bottom: 2%;
+}
+.split_screen_forms .set_temperature {
+    display: inline-block;
+	text-align: left;
+	padding-left: 5%;
+	padding-right: 5%;
+}
+.split_screen_forms .set_humidity {
+    display: inline-block;
+	text-align: left;
+	padding-left: 5%;
+	padding-right: 5%;
+}
+
+/*Organize light/water toggle buttons*/
+.split_screen_toggles {
+	padding-bottom: 2%;
+}
+.split_screen_toggles .toggle_water_interval {
+    display: inline-block;
+	text-align: left;
+	padding-left: 5%;
+	padding-right: 5%;
+}
+.split_screen_toggles .toggle_light {
+    display: inline-block;
+	text-align: left;
+	padding-left: 5%;
+	padding-right: 17%;
+}
+
+
 body {
 	text-align: center;
 	width: 100vw;
@@ -20,12 +83,17 @@ section {
 	text-align: center;
 }
 
-#chart-div {
+chart-div {
 	padding-left: 1cm;
+	padding-bottom: 2%;
 }
 
 form {
-	text-align: right;
+	text-align: left;
+}
+
+input {
+	display: inline-block;
 }
 
 form.div {
