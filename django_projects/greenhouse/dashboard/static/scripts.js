@@ -6,7 +6,7 @@ google.charts.setOnLoadCallback(drawChart);
 function drawChart() {
 	var data = google.visualization.arrayToDataTable([
 	['Label', 'Value'],
-	['Temperature', 80],
+	['Temperature', 25],
 	]);
 
 	var options = {
@@ -14,10 +14,11 @@ function drawChart() {
 		redFrom: 90, redTo: 100,
 		yellowFrom:75, yellowTo: 90,
 		minorTicks: 5,
+		min: 20,
+		max: 100
 	};
 
 	var chart = new google.visualization.Gauge(document.getElementById('chart_div'));
-
 	chart.draw(data, options);
 
 	function updateTemperature(value) {
@@ -25,31 +26,20 @@ function drawChart() {
 		chart.draw(data, options);
 	}
 
-	setInterval(function() {
-		fetchJSON('http://192.168.1.163/temperature', updateTemperature)
-	}, 1000);
+	document.getElementById("get-temperature").addEventListener("click", function() {
+		fetchJSON('http://192.168.1.163/temperature', updateTemperature);
+	}, false);
 }
 
-function updateTemperatureSetpoint(val) {
-	document.getElementById('temperatureInput').value = val;
-	// make fetch request to ESP32
-}
-
-// fetch request
-
+// FETCH REQUEST -- DATA
 
 function logError(error) {
 	console.log('Looks like there was a problem\n', error);
 }
 
-
 function logResult(result) {
 	console.log(result.temperature);
 	return result.temperature;
-}
-
-function readResponseAsJson(response) {
-	return response.json();
 }
 
 function validateResponse(response) {
@@ -64,8 +54,25 @@ function fetchJSON(pathToResource, callback) {
 		method: 'GET',
 	})
 	.then(validateResponse)
-	.then(readResponseAsJson)
+	.then(response => response.json())
 	.then(logResult)
 	.then(callback)
+	.catch(logError)
+}
+
+// FETCH REQUEST -- IMAGE
+
+function fetchImage(pathToResource) {
+	const image = document.getElementById('live-view');
+	fetch(pathToResource, {
+		method: 'GET',
+	})
+	.then(response => response.blob())
+	.then(blob => {
+		const objectURL = URL.createObjectURL(blob);
+		image.src = objectURL;
+		console.log(`image URL is ${String(objectURL)}`);
+		console.log('image set -- debug');
+	})
 	.catch(logError)
 }

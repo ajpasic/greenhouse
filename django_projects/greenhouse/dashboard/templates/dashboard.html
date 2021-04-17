@@ -11,18 +11,14 @@
 </header>
 <body style="text-align: center;">
 	<section>
-		<h1>Plant Live view</h1>
+		<h1>Plant Live View</h1>
+		<img id="live-view">
+		<button onclick="fetchImage('http://192.168.1.163/image')">Take Picture</button>
 	</section>
 	<section id="system-monitor">
 		<h1>System Monitor</h1>
 		<div id="chart_div"></div>
-		<form style="text-align: center;">	
-			<div id="temperature">
-				<label>Temperature Control</label>
-				<input type="range" min="60" max="80" onchange="updateTemperatureSetpoint(this.value);">
-				<input type="text" id="temperatureInput" value="72">
-			</div>
-		</form>
+		<button id="get-temperature">Get Temperature</button>
 	</section>
 </body>
 <footer>

@@ -16,7 +16,7 @@
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-//#include "freertos/queue.h"
+#include "freertos/queue.h"
 #include "driver/uart.h"
 #include "esp_log.h"
 #include "driver/gpio.h"
@@ -46,7 +46,7 @@ char str [30];
 #define MESSAGE_LEN (64)
 
 /************************************************************************
- *                          TYPES DEFINTION                             
+ *                          TYPES DEFINITION                             
  ************************************************************************/
 
 typedef union data_t
@@ -98,24 +98,24 @@ typedef enum {
  *                          GLOBAL VARIABLES                             
  ************************************************************************/
 
-static intr_handle_t handle_console0;
-static intr_handle_t handle_console1;
+static intr_handle_t handle_console0; // UART0 interrupt handler
+static intr_handle_t handle_console1; // UART1 interrupt handler
 
 uint8_t rxbuf0[256];  // UART0 buffer
 uint8_t rxbuf1[256];  // UART1 buffer
 
 status_t status_report[NUM_CODES];
 
-const char* ssid = "71000Sarajevo";
-const char* password = "!Pasword1#";
+/* make sure your credentials.h file is correct! */
 AsyncWebServer server(80);
+AsyncWebServer *pserver = &server;
 
 /************************************************************************
  *                          FUNCTION PROTOTYPES                             
  ************************************************************************/
 
 // initializes wifi connection and server resources
-static void wifi_server_init(AsyncWebServer);
+static void wifi_server_init(AsyncWebServer *server);
 
 // initializes status report array
 static void status_init(void);
@@ -198,8 +198,8 @@ void setup(void)
     Serial.begin(115200);
     status_init();
     uart_init();
-    wifi_server_init(server);
-    // xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE * 2, NULL, 5, NULL);
+    wifi_server_init(pserver);
+    xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE * 2, NULL, 5, NULL);
 }
 
 void loop(void)
@@ -210,8 +210,9 @@ void loop(void)
 /************************************************************************
  *                         FUNCTION IMPLEMENTATION                       
  ************************************************************************/
+
 // initializes wifi connection and server resources
-static void wifi_server_init(AsyncWebServer server) {
+static void wifi_server_init(AsyncWebServer *server) {
   WiFi.begin(ssid, password);
   Serial.print("Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED) {
@@ -221,17 +222,17 @@ static void wifi_server_init(AsyncWebServer server) {
   Serial.print("\nESP32 connected at IP address ");
   Serial.println(WiFi.localIP());
 
-  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server->on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request) {
     cmd_noun_t noun = TEMPERATURE;
     cmd_verb_t verb = GET;
     cmd_alert_t alert;
     
     // TEMPERATURE GET -> TIVA
-    uint8_t tiva_command[9];
+    uint8_t tiva_command[8];
     tiva_command[0] = (uint8_t) noun;
     tiva_command[1] = (uint8_t) verb;
     tiva_command[7] = (uint8_t) 0xFF;
-    uart_write_bytes(TIVA_UART, (const char*) tiva_command, 9);
+    uart_write_bytes(TIVA_UART, (const char *) tiva_command, 8);
 
     // wait until uart buffer is empty
     uart_wait_tx_done(TIVA_UART, 100);
@@ -256,7 +257,7 @@ static void wifi_server_init(AsyncWebServer server) {
   });
 
   // start server
-  server.begin();
+  server->begin();
 }
 
 
@@ -293,20 +294,20 @@ static void uart_init(void)
     uart_param_config(TIVA_UART, &uart_config);
 
     // set pins for uart communication
-    uart_set_pin(PC_UART, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-    uart_set_pin(TIVA_UART, TX1, RX1, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+    ESP_ERROR_CHECK(uart_set_pin(PC_UART, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+    ESP_ERROR_CHECK(uart_set_pin(TIVA_UART, TX1, RX1, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
 
     // install uart drivers
     uart_driver_install(PC_UART, BUF_SIZE, BUF_SIZE, 0, NULL, NULL);
     uart_driver_install(TIVA_UART, BUF_SIZE, BUF_SIZE, 0, NULL, NULL);
 
+    // free isr from uarts
+    // uart_isr_free(PC_UART);
+    // uart_isr_free(TIVA_UART);
+
     // register isr function for uart interrupts
     uart_isr_register(PC_UART, uart_intr_handle0, NULL, ESP_INTR_FLAG_IRAM, &handle_console0);
     uart_isr_register(TIVA_UART, uart_intr_handle1, NULL, ESP_INTR_FLAG_IRAM, &handle_console1);
-
-    // free isr from uarts
-    uart_isr_free(PC_UART);
-    uart_isr_free(TIVA_UART);
 
     // enable receive interrupts
     uart_enable_rx_intr(PC_UART);
