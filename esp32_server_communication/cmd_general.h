@@ -1,5 +1,5 @@
- #ifndef COMMANDS_H_
- #define COMMANDS_H_
+#ifndef COMMANDS_H_
+#define COMMANDS_H_
 
 typedef enum {
   TEMPERATURE = 0,

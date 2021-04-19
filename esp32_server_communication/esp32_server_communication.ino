@@ -1,3 +1,7 @@
+#include "driver/uart.h"
+#include "driver/gpio.h"
+#include "esp_intr_alloc.h"
+
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include "credentials.h" /* make sure you add this file and that its contents are correct! */
@@ -76,14 +80,54 @@ void camera_init(void) {
   Serial.println("Camera init successful");
 }
 
+uint8_t convertASCIItoInteger(uint8_t *data, size_t len) {
+  uint8_t value = 0;
+  for (int i = 0; i < len; i++) {
+    uint8_t increment = (data[i] - '0') * pow(10, len-1 - i);
+    value += increment;
+  }
+  return value;
+}
+
+void uart_init(void) {
+  uart_config_t uart_config = {
+    .baud_rate = 115200,
+    .data_bits = UART_DATA_8_BITS,
+    .parity = UART_PARITY_DISABLE,
+    .stop_bits = UART_STOP_BITS_1,
+    .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
+  };
+  uart_param_config(UART_NUM_1, &uart_config);
+  uart_set_pin(UART_NUM_1, 14, 2, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+  uart_driver_install(UART_NUM_1, 512*2, 512*2, 0, NULL, 0);
+  uart_flush(UART_NUM_1);
+}
+
+void cmd_transmit(cmd_noun_t noun, cmd_verb_t verb, uint8_t *dataArray, uint8_t setpoint = 0x00) {
+  uint8_t result = 0;
+  uint8_t cmd_message[7];
+  if (noun < SIZE_OF_NOUN_TABLE && verb < SIZE_OF_VERB_TABLE) {
+    cmd_message[0] = (uint8_t) noun;
+    cmd_message[1] = (uint8_t) verb;
+    cmd_message[2] = setpoint;
+    cmd_message[6] = 0xFF;
+  }
+  
+  uart_write_bytes(UART_NUM_1, (const char*) cmd_message, 7);
+  uart_wait_tx_done(UART_NUM_1, 100);
+  uart_read_bytes(UART_NUM_1, dataArray, 7, 100);
+  uart_flush(UART_NUM_1);
+}
+
 /*
- * ARDUINO-SPECIFIC
+ * ARDUINO SPECIFIC
  */
 
 void setup() {
   Serial.begin(115200);
 
-  camera_init();
+  //camera_init();
+  uart_init();
 
   WiFi.begin(ssid, password);
   Serial.print("Connecting to WiFi");
@@ -94,10 +138,84 @@ void setup() {
   Serial.print("\nESP32 connected at IP address ");
   Serial.println(WiFi.localIP());
 
-  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request) {
-    unsigned int temperature = random(60, 81);
-    String JSONresponse = String("{\"temperature\":\"") + String(temperature) + String("\"}");
+  server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request) {
+    uint8_t temperature, humidity, water, light;
+    uint8_t arr[7];
+
+    cmd_transmit(TEMPERATURE, GET, arr);
+    temperature = arr[2];
+
+    // get humidity from Tiva C
+    cmd_transmit(HUMIDITY, GET, arr);
+    humidity = arr[2];
+
+    cmd_transmit(WATERING, GET, arr);
+    water = arr[2];
+
+    cmd_transmit(LIGHTING, GET, arr);
+    light = arr[2];
+    
+    String JSONresponse = String("{\"temperature\":\"") + String(temperature) + String("\",");
+    JSONresponse += String("\"humidity\":\"") + String(humidity) + String("\",");
+    JSONresponse += String("\"water\":\"") + String(water) + String("\",");
+    JSONresponse += String("\"light\":\"") + String(light) + String("\"}");
     AsyncWebServerResponse *response = request->beginResponse(200, "application/json", JSONresponse);
+    response->addHeader("Access-Control-Allow-Origin", "*"); // allow resource sharing with any origin
+    request->send(response);
+  });
+
+  server.on("/temperature", HTTP_POST, [](AsyncWebServerRequest *request){}, NULL,
+  [](AsyncWebServerRequest *request, uint8_t *dataArray, size_t len, size_t index, size_t total) {
+    // temperature setpoint
+    uint8_t value = convertASCIItoInteger(dataArray, len);
+    Serial.println(value);
+
+    uint8_t arr[7];
+    cmd_transmit(TEMPERATURE, SET, arr, value);
+    
+    AsyncWebServerResponse *response = request->beginResponse(200);
+    response->addHeader("Access-Control-Allow-Origin", "*"); // allow resource sharing with any origin
+    request->send(response);
+  });
+
+  server.on("/humidity", HTTP_POST, [](AsyncWebServerRequest *request){}, NULL,
+  [](AsyncWebServerRequest *request, uint8_t *dataArray, size_t len, size_t index, size_t total) {
+    // humidity setpoint
+    uint8_t value = convertASCIItoInteger(dataArray, len);
+    Serial.println(value);
+
+    uint8_t arr[7];
+    cmd_transmit(HUMIDITY, SET, arr, value);
+    
+    AsyncWebServerResponse *response = request->beginResponse(200);
+    response->addHeader("Access-Control-Allow-Origin", "*"); // allow resource sharing with any origin
+    request->send(response);
+  });
+
+  server.on("/light", HTTP_POST, [](AsyncWebServerRequest *request){}, NULL,
+  [](AsyncWebServerRequest *request, uint8_t *dataArray, size_t len, size_t index, size_t total) {
+    // light setpoint
+    uint8_t value = convertASCIItoInteger(dataArray, len);
+    Serial.println(value);
+
+    uint8_t arr[7];
+    cmd_transmit(LIGHTING, SET, arr, value);
+    
+    AsyncWebServerResponse *response = request->beginResponse(200);
+    response->addHeader("Access-Control-Allow-Origin", "*"); // allow resource sharing with any origin
+    request->send(response);
+  });
+
+  server.on("/water", HTTP_POST, [](AsyncWebServerRequest *request){}, NULL,
+  [](AsyncWebServerRequest *request, uint8_t *dataArray, size_t len, size_t index, size_t total) {
+    // water setpoint
+    uint8_t value = convertASCIItoInteger(dataArray, len);
+    Serial.println(value);
+
+    uint8_t arr[7];
+    cmd_transmit(WATERING, SET, arr, value);
+    
+    AsyncWebServerResponse *response = request->beginResponse(200);
     response->addHeader("Access-Control-Allow-Origin", "*"); // allow resource sharing with any origin
     request->send(response);
   });
@@ -112,9 +230,8 @@ void setup() {
       response->addHeader("Access-Control-Allow-Origin", "*"); // allow resource sharing with any origin
       request->send(response);
     }
-    
   });
-
+  
   // start server
   server.begin();
 }

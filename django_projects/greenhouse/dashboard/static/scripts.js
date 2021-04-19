@@ -1,4 +1,6 @@
-// gauge
+// Gauge code
+
+/*
 
 google.charts.load('current', {'packages':['gauge']});
 google.charts.setOnLoadCallback(drawChart);
@@ -7,6 +9,7 @@ function drawChart() {
 	var data = google.visualization.arrayToDataTable([
 	['Label', 'Value'],
 	['Temperature', 25],
+	['Humidity', 10]
 	]);
 
 	var options = {
@@ -31,33 +34,33 @@ function drawChart() {
 	}, false);
 }
 
-// FETCH REQUEST -- DATA
+*/
 
-function logError(error) {
-	console.log('Looks like there was a problem\n', error);
-}
+// POLLING
 
-function logResult(result) {
-	console.log(result.temperature);
-	return result.temperature;
-}
+setInterval(function() {
+	fetchJSON('http://192.168.1.86/data')
+}, 1000);
 
-function validateResponse(response) {
-	if (!response.ok) {
-		throw Error(response.statusText);
-	}
-	return response;
-}
+// FETCH REQUEST -- GET DATA
 
-function fetchJSON(pathToResource, callback) {
+function fetchJSON(pathToResource) {
 	fetch(pathToResource, {
 		method: 'GET',
 	})
-	.then(validateResponse)
-	.then(response => response.json())
-	.then(logResult)
-	.then(callback)
-	.catch(logError)
+	.then(function(response) {
+		if (!response.ok) {
+			throw Error(response.statusText);
+		}
+		return response.json();
+	})
+	.then(result => {
+		document.getElementById("system_temperature").innerText = result.temperature;
+		document.getElementById("system_humidity").innerText = result.humidity;
+		document.getElementById("water_level").innerText = result.water;
+		document.getElementById("light_enabled").innerText = result.light;
+	})
+	.catch(error => console.log('look like there was a problem\n', error))
 }
 
 // FETCH REQUEST -- IMAGE
@@ -75,4 +78,62 @@ function fetchImage(pathToResource) {
 		console.log('image set -- debug');
 	})
 	.catch(logError)
+}
+
+// FETCH REQUEST -- SET DATA
+function setTemperature() {
+	console.log(document.getElementById("temperature_setpoint").value)
+	fetch("http://192.168.1.86/temperature", {
+		method: 'POST',
+		body: String(document.getElementById("temperature_setpoint").value)
+	})
+	.then(function(response) {
+		if (!response.ok) {
+			throw Error(response.statusText);
+		}
+		return response;
+	})
+	.catch(error => console.log('look like there was a problem\n', error))
+}
+
+function setHumidity() {
+	fetch("http://192.168.1.86/humidity", {
+		method: 'POST',
+		body: String(document.getElementById("humidity_setpoint").selectedIndex),
+	})
+	.then(function(response) {
+		if (!response.ok) {
+			throw Error(response.statusText);
+		}
+		return response;
+	})
+	.catch(error => console.log('look like there was a problem\n', error))
+}
+
+function setLight() {
+	fetch("http://192.168.1.86/light", {
+		method: 'POST',
+		body: String(document.getElementById("light_setpoint").value),
+	})
+	.then(function(response) {
+		if (!response.ok) {
+			throw Error(response.statusText);
+		}
+		return response;
+	})
+	.catch(error => console.log('look like there was a problem\n', error))
+}
+
+function waterPlant() {
+	fetch("http://192.168.1.86/water", {
+		method: 'POST',
+		body: String(document.getElementById("water_setpoint").value)
+	})
+	.then(function(response) {
+		if (!response.ok) {
+			throw Error(response.statusText);
+		}
+		return response;
+	})
+	.catch(error => console.log('look like there was a problem\n', error))
 }
