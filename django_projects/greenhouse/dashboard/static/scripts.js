@@ -63,21 +63,33 @@ function fetchJSON(pathToResource) {
 	.catch(error => console.log('look like there was a problem\n', error))
 }
 
-// FETCH REQUEST -- IMAGE
+// GET REQUEST -- IMAGE
 
-function fetchImage(pathToResource) {
-	const image = document.getElementById('live-view');
-	fetch(pathToResource, {
-		method: 'GET',
-	})
-	.then(response => response.blob())
-	.then(blob => {
-		const objectURL = URL.createObjectURL(blob);
-		image.src = objectURL;
-		console.log(`image URL is ${String(objectURL)}`);
-		console.log('image set -- debug');
-	})
-	.catch(logError)
+function downloadImage(path) {
+	downloadedImg = new Image;
+	downloadedImg.crossOrigin = "Anonymous";
+	downloadedImg.addEventListener("load", imageReceived, False);
+	downloadedImg.src = path;
+
+	drawImage(downloadedImg)
+}
+
+function drawImage(img) {
+	let canvas = document.createElement("canvas");
+	let context = canvas.getContext("2d");
+
+	canvas.width = img.width;
+	canvas.height = img.height;
+
+	context.drawImage(img, 0, 0);
+	imageBox.appendChild(canvas);
+
+	try {
+		localStorage.setItem("saved-image-example", canvas.toDataURL("image/png"));
+	}
+	catch(err) {
+		console.log("Error: ", err);
+	}
 }
 
 // FETCH REQUEST -- SET DATA
