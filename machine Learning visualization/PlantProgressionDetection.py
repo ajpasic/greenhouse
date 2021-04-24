@@ -263,6 +263,8 @@ for img_path in images_path:
     # resize image
     #resized = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
 
+    #Comment out  cv2.imshow("Image", resized), key = cv2.waitKey(0), cv2.destroyAllWindows() to not display image
+
     cv2.imshow("Image", resized)
     cv2.imwrite("Detected_Image.jpg", resized)
 
